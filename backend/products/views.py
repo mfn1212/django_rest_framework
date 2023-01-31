@@ -4,6 +4,7 @@ from rest_framework import generics
 from .models import Product
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
+from rest_framework import mixins
 
 
 class ProductDetailAPIView(generics.RetrieveAPIView):
@@ -73,6 +74,7 @@ class ProductDestroyAPIView(generics.DestroyAPIView):
 
 product_destroy_view = ProductDestroyAPIView.as_view()
 
+
 @api_view(["POST", "GET"])
 def product_alt_view(request, pk=None, *args, **kwargs):
     method = request.method
@@ -84,13 +86,49 @@ def product_alt_view(request, pk=None, *args, **kwargs):
             queryset = Product.objects.all()
             data = ProductSerializer(queryset, many=True).data
         return Response(data)
-    
+
     serializer = ProductSerializer(data=request.data)
     if serializer.is_valid(raise_exception=True):
         content = serializer.validated_data.get("content") or None
         if not content:
             title = serializer.validated_data.get("title")
-            content =title
-        
+            content = title
+
         serializer.save(content=content)
         return Response(serializer.data)
+
+
+class ProductMixinView(
+        generics.GenericAPIView,
+        mixins.CreateModelMixin,
+        mixins.ListModelMixin,
+        mixins.RetrieveModelMixin,
+        mixins.UpdateModelMixin,
+):
+    queryset = Product.objects.all()
+    serializer_class = ProductSerializer
+    lookup_field = "pk"  #default
+
+    def get(self, request, *args, **kwargs):
+        pk = kwargs.get('pk')
+        if pk is not None:
+            return self.retrieve(request, *args, **kwargs)
+        return self.list(request, *args, **kwargs)
+
+    def post(self, request, *args, **kwargs):
+        pk = kwargs.get('pk')
+        if pk is not None:
+            return self.update(request, *args, **kwargs)
+        return self.create(request, *args, **kwargs)
+
+    def perform_create(self, serializer):
+        # serializer.save (user = self.request.user)
+        content = serializer.validated_data.get("content") or None
+        if not content:
+            title = serializer.validated_data.get("title")
+            content = title
+        serializer.save(content=content)
+
+    def perform_update(self, serializer):
+        serializer.save()
+product_mixin_view = ProductMixinView.as_view()
