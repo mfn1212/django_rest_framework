@@ -4,7 +4,7 @@ from rest_framework import generics
 from .models import Product
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
-from rest_framework import mixins
+from rest_framework import mixins, permissions, authentication
 
 
 class ProductDetailAPIView(generics.RetrieveAPIView):
@@ -26,7 +26,8 @@ product_list_view = ProductListAPIView.as_view()
 class ProductListCreateAPIView(generics.ListCreateAPIView):
     queryset = Product.objects.all()
     serializer_class = ProductSerializer
-
+    permission_classes = [permissions.IsAuthenticatedOrReadOnly]
+    authentication_classes = [authentication.SessionAuthentication]  # authenticated with admin panel log in 
     def perform_create(self, serializer):
         # serializer.save(user = self.request.user)     # diffrent work in serializer depond on user
         content = serializer.validated_data.get("content") or None
@@ -70,6 +71,8 @@ product_update_view = ProductUpdateAPIView.as_view()
 class ProductDestroyAPIView(generics.DestroyAPIView):
     queryset = Product.objects.all()
     serializer_class = ProductSerializer
+    permission_classes = []
+    authentication_classes = []
 
 
 product_destroy_view = ProductDestroyAPIView.as_view()
@@ -131,4 +134,6 @@ class ProductMixinView(
 
     def perform_update(self, serializer):
         serializer.save()
+
+
 product_mixin_view = ProductMixinView.as_view()
