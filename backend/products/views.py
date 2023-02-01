@@ -26,7 +26,10 @@ product_list_view = ProductListAPIView.as_view()
 class ProductListCreateAPIView(generics.ListCreateAPIView):
     queryset = Product.objects.all()
     serializer_class = ProductSerializer
-    permission_classes = [permissions.IsAuthenticatedOrReadOnly]
+    permission_classes = [permissions.DjangoModelPermissions] # permission that user has in admin panel
+    #  django model perission is not good option
+    #  because when you dont give permission to view product in admin panel it is not view able
+    #  but when send request whith api it is view able 
     authentication_classes = [authentication.SessionAuthentication]  # authenticated with admin panel log in 
     def perform_create(self, serializer):
         # serializer.save(user = self.request.user)     # diffrent work in serializer depond on user
