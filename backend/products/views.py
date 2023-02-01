@@ -5,6 +5,7 @@ from .models import Product
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from rest_framework import mixins, permissions, authentication
+from .permissions import IsStuffEditorPermission
 
 
 class ProductDetailAPIView(generics.RetrieveAPIView):
@@ -26,7 +27,7 @@ product_list_view = ProductListAPIView.as_view()
 class ProductListCreateAPIView(generics.ListCreateAPIView):
     queryset = Product.objects.all()
     serializer_class = ProductSerializer
-    permission_classes = [permissions.DjangoModelPermissions] # permission that user has in admin panel
+    permission_classes = [IsStuffEditorPermission]   # permission that user has in admin panel
     #  django model perission is not good option
     #  because when you dont give permission to view product in admin panel it is not view able
     #  but when send request whith api it is view able 
