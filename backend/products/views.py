@@ -28,7 +28,7 @@ class ProductListCreateAPIView(generics.ListCreateAPIView):
     queryset = Product.objects.all()
     serializer_class = ProductSerializer
     permission_classes = [IsStuffEditorPermission,permissions.IsAdminUser] 
-    authentication_classes = [authentication.SessionAuthentication]
+    authentication_classes = [authentication.TokenAuthentication ,authentication.SessionAuthentication]
     def perform_create(self, serializer):
         # serializer.save(user = self.request.user)     # diffrent work in serializer depond on user
         content = serializer.validated_data.get("content") or None
