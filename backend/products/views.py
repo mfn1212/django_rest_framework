@@ -6,7 +6,7 @@ from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from rest_framework import mixins, permissions, authentication
 from .permissions import IsStuffEditorPermission
-
+from api.authentication import TokenAuthentication
 
 class ProductDetailAPIView(generics.RetrieveAPIView):
     queryset = Product.objects.all()
@@ -28,7 +28,7 @@ class ProductListCreateAPIView(generics.ListCreateAPIView):
     queryset = Product.objects.all()
     serializer_class = ProductSerializer
     permission_classes = [IsStuffEditorPermission,permissions.IsAdminUser] 
-    authentication_classes = [authentication.TokenAuthentication ,authentication.SessionAuthentication]
+    authentication_classes = [TokenAuthentication ,authentication.SessionAuthentication]
     def perform_create(self, serializer):
         # serializer.save(user = self.request.user)     # diffrent work in serializer depond on user
         content = serializer.validated_data.get("content") or None
