@@ -5,10 +5,13 @@ from .models import Product
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from rest_framework import mixins, permissions, authentication
-from .permissions import IsStuffEditorPermission
+from api.permissions import IsStuffEditorPermission
 from api.authentication import TokenAuthentication
+from api.mixins import StaffEditorPermissionMixin, AuthenticationMixin
 
-class ProductDetailAPIView(generics.RetrieveAPIView):
+
+class ProductDetailAPIView(generics.RetrieveAPIView,
+                           StaffEditorPermissionMixin, AuthenticationMixin):
     queryset = Product.objects.all()
     serializer_class = ProductSerializer
 
@@ -16,7 +19,8 @@ class ProductDetailAPIView(generics.RetrieveAPIView):
 product_detail_view = ProductDetailAPIView.as_view()
 
 
-class ProductListAPIView(generics.ListAPIView):
+class ProductListAPIView(generics.ListAPIView, StaffEditorPermissionMixin,
+                         AuthenticationMixin):
     queryset = Product.objects.all()
     serializer_class = ProductSerializer
 
@@ -24,11 +28,12 @@ class ProductListAPIView(generics.ListAPIView):
 product_list_view = ProductListAPIView.as_view()
 
 
-class ProductListCreateAPIView(generics.ListCreateAPIView):
+class ProductListCreateAPIView(generics.ListCreateAPIView,
+                               StaffEditorPermissionMixin,
+                               AuthenticationMixin):
     queryset = Product.objects.all()
     serializer_class = ProductSerializer
-    permission_classes = [IsStuffEditorPermission,permissions.IsAdminUser] 
-    authentication_classes = [TokenAuthentication ,authentication.SessionAuthentication]
+
     def perform_create(self, serializer):
         # serializer.save(user = self.request.user)     # diffrent work in serializer depond on user
         content = serializer.validated_data.get("content") or None
@@ -41,7 +46,8 @@ class ProductListCreateAPIView(generics.ListCreateAPIView):
 product_listcreat_view = ProductListCreateAPIView.as_view()
 
 
-class ProductCreateAPIView(generics.CreateAPIView):
+class ProductCreateAPIView(generics.CreateAPIView, StaffEditorPermissionMixin,
+                           AuthenticationMixin):
     queryset = Product.objects.all()
     serializer_class = ProductSerializer
 
@@ -57,7 +63,8 @@ class ProductCreateAPIView(generics.CreateAPIView):
 product_create_view = ProductCreateAPIView.as_view()
 
 
-class ProductUpdateAPIView(generics.UpdateAPIView):
+class ProductUpdateAPIView(generics.UpdateAPIView, StaffEditorPermissionMixin,
+                           AuthenticationMixin):
     queryset = Product.objects.all()
     serializer_class = ProductSerializer
 
@@ -69,7 +76,8 @@ class ProductUpdateAPIView(generics.UpdateAPIView):
 product_update_view = ProductUpdateAPIView.as_view()
 
 
-class ProductDestroyAPIView(generics.DestroyAPIView):
+class ProductDestroyAPIView(generics.DestroyAPIView,
+                            StaffEditorPermissionMixin, AuthenticationMixin):
     queryset = Product.objects.all()
     serializer_class = ProductSerializer
     permission_classes = []
