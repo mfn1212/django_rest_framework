@@ -1,5 +1,6 @@
 import requests
 from getpass import getpass
+from rest_framework.authtoken.models import Token  # change this class to change Token for example add expire date
 
 username = input('whats your username ?')
 password = getpass('whats your password ?')
